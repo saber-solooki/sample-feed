@@ -1,0 +1,11 @@
+CELERYD_NODES="worker1"
+
+CELERY_BIN="/usr/local/bin/celery"
+
+CELERY_APP=feedy
+
+CELERYD_OPTS="-l info"
+
+CELERYD_USER="root"
+
+CELERYD_GROUP="root"

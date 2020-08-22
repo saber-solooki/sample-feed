@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  web:
+    image: ${app_label}_web
+    container_name: ${app_name}_app
+    restart: always
+    build: ./${app_name}
+    volumes:
+      - web-static:/home/webapp/static
+      - ./${app_name}/:/home/webapp/
+    environment:
+      DEBUG: 'true'
+      WEB_APP_NAME: ${app_name}
+      DB_NAME: ${db_name}
+      DB_USER: ${db_user}
+      DB_PASS: ${db_pass}
+      DB_SERVICE: ${db_service}
+      DB_PORT: ${db_port}
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbit:5672"
+      CELERY_BACKEND_URL: "redis://redis/0"
+    depends_on:
+      - rabbit
+      - redis
+    ports:
+      - 127.0.0.1:8181:8181
+    entrypoint: sh /home/webapp/entrypoint.sh
+    command: celery -A ${app_name} beat -l info
+
+  nginx:
+    image: ${app_label}_nginx
+    container_name: ${app_name}_web_server
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - nginx-static:/www/static
+
+  postgres:
+    container_name: ${app_name}_DB
+    restart: always
+    image: postgres:latest
+    # volumes:
+    #   - pgdata:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: ${db_user}
+      POSTGRES_PASSWORD: ${db_pass}
+      POSTGRES_DB: ${db_name}
+
+  pgadmin:
+    container_name: ${app_name}_DB_console
+    image: dpage/pgadmin4
+    ports:
+      - 127.0.0.1:55106:55106/tcp
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=sabers@systemgroup.net
+      - PGADMIN_DEFAULT_PASSWORD=coa@sg.net
+      - PGADMIN_LISTEN_PORT=55106
+
+  redis:
+    container_name: ${app_name}_redis
+    restart: always
+    image: redis:latest
+    volumes:
+      - redisdata:/data
+
+  rabbit:
+    container_name: ${app_name}_rabbit
+    image: rabbitmq:latest
+
+volumes:
+  nginx-static:
+  web-static:
+  pgdata:
+  redisdata:

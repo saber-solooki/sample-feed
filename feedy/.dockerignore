@@ -1,0 +1,10 @@
+*/__pycache__*
+celerybeat*
+Dockerfile*
+venv*
+.idea*
+.git*
+.log*
+static*
+README*
+*/migrations*
