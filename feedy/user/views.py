@@ -13,13 +13,11 @@ class AccountView(CACreateAPIView):
     def __init__(self, use_case: CreateUserUseCase, *args, **kwargs):
         super(AccountView, self).__init__(*args, **kwargs)
         self.use_case = use_case
-        self.username = None
-        self.password = None
         self.serializer = None
 
     def is_data_valid(self, request):
         self.serializer = CreateAccountSerializer(data=request.data)
         return self.serializer.is_valid()
 
-    def perform_create_data(self, request):
+    def perform_create_data(self, request, *args, **kwargs):
         self.use_case.register_user(self.serializer.validated_data['username'], self.serializer.validated_data['password'])

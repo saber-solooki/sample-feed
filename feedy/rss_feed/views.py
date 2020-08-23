@@ -7,7 +7,7 @@ from rss_feed.domain.use_cases.create_channel import CreateChannelUseCase
 from rss_feed.serializer import CreateFeedSerializer, ChannelSerializer
 
 
-class ChannelView(RetrieveDataMixin, CreateDataMixin, CleanAPIView):
+class ChannelView(CreateDataMixin, CleanAPIView):
     @inject.autoparams()
     def __init__(self, use_case: CreateChannelUseCase, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,14 +20,6 @@ class ChannelView(RetrieveDataMixin, CreateDataMixin, CleanAPIView):
             return self.serializer.is_valid()
 
         return super().is_data_valid(request)
-
-    def get(self, request, *args, **kwargs):
-        self.check_request_data(request)
-        return self.retrieve(request, *args, **kwargs)
-
-    def get_data_query(self, request, *args, **kwargs):
-        channel_id = kwargs.get('channel_id')
-        pass
 
     def post(self, request, *args, **kwargs):
         self.check_request_data(request)
